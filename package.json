@@ -2,9 +2,9 @@
   "name": "mozdoc",
   "version": "0.0.2",
   "dependencies": {
-    "wintersmith": "^2.0.10",
+    "wintersmith": "^2.1.0",
     "wintersmith-livereload": "^0.1.1",
-    "wintersmith-node-sass": "^0.1.0",
+    "wintersmith-node-sass": "^0.2.1",
     "shelljs": "^0.3.0",
     "chokidar": "^0.8.2",
     "commander": "^2.2.0"
