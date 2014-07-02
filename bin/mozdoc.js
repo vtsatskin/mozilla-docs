@@ -2,6 +2,8 @@
 
 var shell = require('shelljs');
 var program = require('commander');
+var git = require("gift");
+var path = require("path");
 
 var command = process.argv[2];
 var wintersmithPath = './node_modules/mozdoc';
@@ -32,17 +34,75 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
-var copyResources = function() {
-  // Copies user's authored documents and images into our wintersmith directory.
-  shell.cp('-Rf', './documents/*', wintersmithPath + '/contents/');
-  shell.cp('-Rf', './images/*', wintersmithPath + '/contents/images');
+function deleteTempFiles() {
+  if(shell.test('-e', 'tmp/')) {
+    shell.rm('-rf', 'tmp/');
+  }
+}
+
+function copyResources(src, dest) {
+  // Copies user's authored resources into our wintersmith directory.
+
+  var copyPaths = ['documents', 'images'];
+
+  for (var i = 0; i < copyPaths.length; i++) {
+    var p = path.join(src, copyPaths[i], '*');
+    if(shell.test('-e', p)) {
+      shell.cp('-Rf', p, path.join(dest, 'contents'));
+    }
+  }
+}
+
+function buildBranches() {
+  var branchTempPath = "./tmp/branches";
+
+  repo = git("./");
+  repo.branch(function(err, currentBranch) {
+    repo.branches(function(err, heads) {
+      for (var i = 0; i < heads.length; i++) {
+        var branch = heads[i];
+
+        if(branch.name === currentBranch.name) {
+          // Don't clone current branch
+          continue;
+        }
+
+        var dest = path.join(branchTempPath, branch.name);
+
+        shell.exec("git clone -b " + branch.name + " ./ " + dest);
+
+        build({
+          source: dest,
+          output: path.join("build", branch.name),
+          wsTempPath: path.join(dest, "tmp/wintersmith")
+        });
+      }
+    });
+  });
+}
+
+function build(opts) {
+  var opts = opts || {};
+  var wsTemplatePath = opts.wsTemplatePath
+                      || "./node_modules/mozdoc/wintersmith/*";
+  var source = opts.source || "./";
+  var output = path.resolve("./", opts.output || "build");
+  var wsTempPath = opts.wsTempPath || "./tmp/wintersmith";
+
+  shell.mkdir('-p', wsTempPath);
+
+  shell.cp('-Rf', wsTemplatePath, wsTempPath);
+  copyResources(source, wsTempPath);
+
+  shell.exec('wintersmith build '
+            + '--chdir "' + wsTempPath + '" '
+            + '-X --output ' + output);
 }
 
 if(command == 'build') {
-  copyResources();
-  shell.exec('wintersmith build '
-            + '--chdir "' + wintersmithPath + '" '
-            + '-X --output "' + originalPath + '/build"');
+  deleteTempFiles();
+  build();
+  buildBranches();
 }
 else if(command == 'serve') {
   require('chokidar')
