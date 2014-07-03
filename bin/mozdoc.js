@@ -5,6 +5,7 @@ var program = require('commander');
 var git = require("gift");
 var path = require("path");
 var wintersmith = require('wintersmith');
+var extend = require('extend');
 
 var command = process.argv[2];
 var wintersmithPath = './node_modules/mozdoc';
@@ -138,34 +139,35 @@ function createRedirect(opts) {
 
 // Builds a wintersmith static site.
 function build(opts) {
-  var opts = opts || {};
-  var wsTemplatePath = opts.wsTemplatePath
-                      || "./node_modules/mozdoc/wintersmith/";
-  var source = opts.source || "./";
-  var output = path.resolve("./", opts.output || "build");
-  var repoData = opts.repoData || null;
-  var branch = opts.branch || null;
-  var wsTempPath = opts.wsTempPath || "./tmp/wintersmith";
+  var DEFAULT_OPTIONS = {
+    source: './', // mozilla-doc source directory
+    output: 'build', // directory to build site to
+    repoData: null, // git repository info from getRepoData();
+    branch: null, // Name of the branch being built, required if repoData used
+    wsTemplatePath: './node_modules/mozdoc/wintersmith/',
+    wsTempPath: './tmp/wintersmith' // directory to copy wsTemplatePath to
+  };
+  opts = extend({}, DEFAULT_OPTIONS, opts || {});
 
-  shell.mkdir('-p', wsTempPath);
+  shell.mkdir('-p', opts.wsTempPath);
 
-  copyWintersmithSkeleton(wsTemplatePath, wsTempPath);
-  copyResources(source, wsTempPath);
+  copyWintersmithSkeleton(opts.wsTemplatePath, opts.wsTempPath);
+  copyResources(opts.source, opts.wsTempPath);
 
   // The wintersmith template needs to know about our branches. We're going to
   // inject them into the site's config as locals.
-  var configPath = path.resolve("./", path.join(wsTempPath, 'config.json'));
+  var configPath = path.resolve("./", path.join(opts.wsTempPath, 'config.json'));
   var config = require(configPath);
-  if(repoData) {
-    var branches = repoData.branches.map(function(b) { return b.name });
+  if(opts.repoData) {
+    var branches = opts.repoData.branches.map(function(b) { return b.name });
 
     config.locals = config.locals || {};
     config.locals.branches = branches;
-    config.locals.currentBranch = branch;
+    config.locals.currentBranch = opts.branch;
   }
 
-  var env = wintersmith(config, wsTempPath);
-  env.build(output, function(error) {
+  var env = wintersmith(config, opts.wsTempPath);
+  env.build(opts.output, function(error) {
     if (error) throw error;
   });
 }
