@@ -66,7 +66,6 @@ h1 {
     /*margin-bottom: 10px;*/
     padding-bottom: 18px;
     font-size: 30px;
-    border-bottom: 1px solid #DDD;
 }
 h2 {
     font-size: 24px;
@@ -244,4 +243,55 @@ table td {
 
 blockquote p {
     margin-bottom: 25px;
+}
+
+header {
+    border-bottom: 1px solid #DDD;
+}
+header h1 {
+    width: calc(100% - 127px);
+    display: inline-block;
+}
+
+.version-info {
+    display: inline-block;
+    width: 127px;
+    text-align: right;
+
+    .octicon-git-branch {
+      margin-right: 7px;
+    }
+}
+.version-info-select,
+.version-info-history-link {
+  width: 105px;
+}
+.version-info-history {
+    display: block;
+    font-weight: 700;
+
+    .octicon {
+      color: #545457;
+      margin-right: 5px;
+    }
+}
+.version-info-history-link {
+  text-decoration: none;
+  color: #0069D6;
+}
+
+@media screen and (max-width: 480px) {
+    header h1 {
+      width: 100%;
+    }
+
+    .version-info {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 10px;
+    }
+    .version-info-history {
+        display: inline;
+        margin-right: 20px;
+    }
 }

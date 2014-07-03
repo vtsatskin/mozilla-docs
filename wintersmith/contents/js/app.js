@@ -7,8 +7,8 @@ $(document).ready(function(){
     scrollduration: 0
   });
 
-  var selectedValue = $('.version-browser option[selected]').val();
-  $('.version-browser').change(function() {
+  var selectedValue = $('.version-info-select option[selected]').val();
+  $('.version-info-select').change(function() {
     var val = $(this).val();
     if(selectedValue != val) {
       window.location = val;
