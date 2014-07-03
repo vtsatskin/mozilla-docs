@@ -85,6 +85,19 @@ function copyResources(src, dest) {
   }
 }
 
+function copyWintersmithSkeleton(src, dest) {
+  // Do not copy over node_modules due to the size. Symlink it instead.
+  var sources = shell.ls(src)
+                  .filter(function(f) { return f != "node_modules" })
+                  .map(function(f) { return path.join(src, f) });
+
+  shell.cp('-Rf', sources, dest);
+
+  var modulesSrc = path.join(src, 'node_modules');
+  var modulesDest = path.join(dest, 'node_modules');
+  shell.ln('-s', modulesSrc, modulesDest);
+}
+
 // Builds each branch as a static site under ./build/<branch name>.
 function buildBranches(repoData) {
   var branchTempPath = "./tmp/branches";
@@ -127,7 +140,7 @@ function createRedirect(opts) {
 function build(opts) {
   var opts = opts || {};
   var wsTemplatePath = opts.wsTemplatePath
-                      || "./node_modules/mozdoc/wintersmith/*";
+                      || "./node_modules/mozdoc/wintersmith/";
   var source = opts.source || "./";
   var output = path.resolve("./", opts.output || "build");
   var repoData = opts.repoData || null;
@@ -136,7 +149,7 @@ function build(opts) {
 
   shell.mkdir('-p', wsTempPath);
 
-  shell.cp('-Rf', wsTemplatePath, wsTempPath);
+  copyWintersmithSkeleton(wsTemplatePath, wsTempPath);
   copyResources(source, wsTempPath);
 
   // The wintersmith template needs to know about our branches. We're going to
