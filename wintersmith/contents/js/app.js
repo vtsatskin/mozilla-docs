@@ -6,4 +6,12 @@ $(document).ready(function(){
   $('#toc').ddscrollSpy({
     scrollduration: 0
   });
+
+  var selectedValue = $('.version-browser option[selected]').val();
+  $('.version-browser').change(function() {
+    var val = $(this).val();
+    if(selectedValue != val) {
+      window.location = val;
+    }
+  });
 })
