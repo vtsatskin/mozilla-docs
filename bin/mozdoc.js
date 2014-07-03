@@ -78,9 +78,9 @@ function copyResources(src, dest) {
   var copyPaths = ['documents', 'images'];
 
   for (var i = 0; i < copyPaths.length; i++) {
-    var p = path.join(src, copyPaths[i], '*');
+    var p = path.join(src, copyPaths[i]);
     if(shell.test('-e', p)) {
-      shell.cp('-Rf', p, path.join(dest, 'contents'));
+      shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
     }
   }
 }
