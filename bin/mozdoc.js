@@ -11,6 +11,8 @@ var command = process.argv[2];
 var wintersmithPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
 
+var mozdocPaths = ['documents', 'images'];
+
 if(!shell.test('-e', wintersmithPath)) {
   console.error('  Error: Please install mozdoc npm package localy:');
   console.error('\n\tnpm install mozdoc\n');
@@ -76,12 +78,17 @@ function deleteBuildFiles() {
 
 // Copies user's authored resources into our wintersmith directory.
 function copyResources(src, dest) {
-  var copyPaths = ['documents', 'images'];
+  var mozdocPaths = ['documents', 'images'];
 
-  for (var i = 0; i < copyPaths.length; i++) {
-    var p = path.join(src, copyPaths[i]);
+  for (var i = 0; i < mozdocPaths.length; i++) {
+    var p = path.join(src, mozdocPaths[i]);
     if(shell.test('-e', p)) {
-      shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
+      if(p === 'documents') {
+        shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
+      }
+      else {
+        shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents', p));
+      }
     }
   }
 }
@@ -100,8 +107,16 @@ function copyWintersmithSkeleton(src, dest) {
 }
 
 // Builds each branch as a static site under ./build/<branch name>.
-function buildBranches(repoData) {
+function buildBranches(repoData, callback) {
   var branchTempPath = "./tmp/branches";
+
+  var builds = 0;
+  var onBuildComplete = function() {
+    builds++;
+    if(builds >= repoData.branches.length) {
+      callback();
+    }
+  }
 
   for (var i = 0; i < repoData.branches.length; i++) {
     var branch = repoData.branches[i];
@@ -121,8 +136,8 @@ function buildBranches(repoData) {
       output: path.join("build", branch.name),
       wsTempPath: path.join(source, "tmp/wintersmith"),
       repoData: repoData,
-      branch: branch.name
-    });
+      branch: branch.name,
+    }, onBuildComplete);
   }
 }
 
@@ -138,7 +153,7 @@ function createRedirect(opts) {
 }
 
 // Builds a wintersmith static site.
-function build(opts) {
+function build(opts, callback) {
   var DEFAULT_OPTIONS = {
     source: './', // mozilla-doc source directory
     output: 'build', // directory to build site to
@@ -168,41 +183,43 @@ function build(opts) {
 
   var env = wintersmith(config, opts.wsTempPath);
   env.build(opts.output, function(error) {
-    if (error) throw error;
+    callback(error);
   });
 }
 
-if(command == 'build') {
+function serve(repoData, callback) {
+  var env = wintersmith("./tmp/wintersmith/config.json", "./tmp/wintersmith");
+  env.preview(function(error, server) {
+    if (error) throw error;
+    callback(error);
+  });
+}
+
+if(command === 'build' || command === 'serve') {
   deleteBuildFiles();
   deleteTempFiles();
 
   getRepoData(function(err, repoData) {
-    buildBranches(repoData);
+    var onBranchesBuilt = function() {
+      createRedirect({
+        source: "./build/index.html",
+        dest: repoData.currentBranch,
+      });
 
-    // Wintersmith building is asynchronous so we can't be guaranteed the build
-    // path has been created yet. Create it now if needed.
-    if (!shell.test('-e', './build')) {
-      shell.mkdir('-p', './build');
-    }
+      if(command === 'serve') {
+        serve(repoData, function(err) {
+          require('chokidar')
+            .watch(mozdocPaths, {ignored: /[\/\\]\./})
+            .on('all', function(event, path) {
+              console.log("event:", event, "path:", path);
+              copyResources('./', './tmp/wintersmith');
+            });
+        });
+      }
+    };
 
-    createRedirect({
-      source: "./build/index.html",
-      dest: repoData.currentBranch,
-    });
+    buildBranches(repoData, onBranchesBuilt);
   });
-}
-else if(command == 'serve') {
-  require('chokidar')
-    .watch('./documents/', {ignored: /[\/\\]\./})
-    .on('all', function(event, path) {
-      copyResources();
-    });
-
-  // Wintersmith should be run aysnc or it will block our file watcher
-  shell.exec('wintersmith preview '
-            + '--chdir "'+ wintersmithPath + '" '
-            + '--output "' + originalPath + '/build"',
-            { async:true });
 }
 else {
   console.error("  Error: '" + command + "' is not a valid command");
