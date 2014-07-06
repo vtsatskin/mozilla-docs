@@ -21,5 +21,5 @@ path.
 Put markdown files into a `documents/` folder inside your project folder.
 Images should be placed into `images/`.
 
-1. Run `mozdoc serve` to preview your doc and serve a live copy locally.
-2. Run `mozdoc build` to build a production ready `build/` directory.
+* Run `mozdoc serve` to preview your doc and serve a live copy locally.
+* Run `mozdoc build` to build a production ready `build/` directory.
