@@ -10,7 +10,7 @@ var extend = require('extend');
 var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
 
-var mozdocResourcePaths = ['documents', 'images', 'css'];
+var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];
 
 if(!shell.test('-e', mozdocPath)) {
   console.error('  Error: Please install mozdoc npm package localy:');
