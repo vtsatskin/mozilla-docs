@@ -129,7 +129,7 @@ function buildBranches(repoData, callback) {
     var source;
     if (branch.name === repoData.currentBranch) {
       // Don't clone current branch since it's already checked out.
-      source = program.chdir || "./";
+      source = program.chdir;
     }
     else {
       source = path.join(branchTempPath, branch.name, program.chdir);
@@ -160,7 +160,7 @@ function createRedirect(opts) {
 // Builds a wintersmith static site.
 function build(opts, callback) {
   var DEFAULT_OPTIONS = {
-    source: './', // mozilla-doc source directory
+    source: program.chdir, // mozilla-doc source directory
     output: program.output, // directory to build site to
     repoData: null, // git repository info from getRepoData();
     branch: null, // Name of the branch being built, required if repoData used
@@ -217,7 +217,7 @@ if(command === 'build' || command === 'serve') {
             .watch(mozdocResourcePaths, {ignored: /[\/\\]\./})
             .on('all', function(event, path) {
               console.log("event:", event, "path:", path);
-              copyResources('./', './tmp/wintersmith');
+              copyResources(program.chdir, './tmp/wintersmith');
             });
         });
       }
