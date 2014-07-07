@@ -21,6 +21,7 @@ if(!shell.test('-e', wintersmithPath)) {
 program
   .version('0.0.1')
   .option('-o, --output [path]', 'directory to write build-output (defaults to ./build)')
+  .option('-C, --chdir [path]', 'change the working directory')
   .usage('[command]');
 
 program.on('--help', function() {
@@ -41,6 +42,9 @@ program.parse(process.argv);
 var command = program.args[0];
 
 program.output = program.output || "./build";
+program.chdir = program.chdir || "./";
+
+
 // Gets relevant git repo information and passes an object to the callback when // done. The callback as a signature of: callback(err, repoData).
 //
 // repoData structure: {
@@ -125,10 +129,10 @@ function buildBranches(repoData, callback) {
     var source;
     if (branch.name === repoData.currentBranch) {
       // Don't clone current branch since it's already checked out.
-      source = "./";
+      source = program.chdir || "./";
     }
     else {
-      source = path.join(branchTempPath, branch.name);
+      source = path.join(branchTempPath, branch.name, program.chdir);
       shell.exec("git clone -b " + branch.name + " ./ " + source);
     }
 
