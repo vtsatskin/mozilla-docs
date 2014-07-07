@@ -20,6 +20,7 @@ if(!shell.test('-e', wintersmithPath)) {
 
 program
   .version('0.0.1')
+  .option('-o, --output [path]', 'directory to write build-output (defaults to ./build)')
   .usage('[command]');
 
 program.on('--help', function() {
@@ -38,6 +39,8 @@ program.on('--help', function() {
 program.parse(process.argv);
 
 var command = program.args[0];
+
+program.output = program.output || "./build";
 // Gets relevant git repo information and passes an object to the callback when // done. The callback as a signature of: callback(err, repoData).
 //
 // repoData structure: {
@@ -71,8 +74,8 @@ function deleteTempFiles() {
 }
 
 function deleteBuildFiles() {
-  if(shell.test('-e', 'build/')) {
-    shell.rm('-rf', 'build/');
+  if(shell.test('-e', program.output)) {
+    shell.rm('-rf', program.output);
   }
 }
 
@@ -131,7 +134,7 @@ function buildBranches(repoData, callback) {
 
     build({
       source: source,
-      output: path.join("build", branch.name),
+      output: path.join(program.output, branch.name),
       wsTempPath: path.join(source, "tmp/wintersmith"),
       repoData: repoData,
       branch: branch.name,
@@ -154,7 +157,7 @@ function createRedirect(opts) {
 function build(opts, callback) {
   var DEFAULT_OPTIONS = {
     source: './', // mozilla-doc source directory
-    output: 'build', // directory to build site to
+    output: program.output, // directory to build site to
     repoData: null, // git repository info from getRepoData();
     branch: null, // Name of the branch being built, required if repoData used
     wsTemplatePath: path.join(mozdocPath, 'wintersmith'),
@@ -200,7 +203,7 @@ if(command === 'build' || command === 'serve') {
   getRepoData(function(err, repoData) {
     var onBranchesBuilt = function() {
       createRedirect({
-        source: "./build/index.html",
+        source: path.join(program.output, "index.html"),
         dest: repoData.currentBranch,
       });
 
