@@ -7,11 +7,10 @@ var path = require("path");
 var wintersmith = require('wintersmith');
 var extend = require('extend');
 
-var command = process.argv[2];
-var wintersmithPath = './node_modules/mozdoc';
+var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
 
-var mozdocPaths = ['documents', 'images'];
+var mozdocResourcePaths = ['documents', 'images'];
 
 if(!shell.test('-e', wintersmithPath)) {
   console.error('  Error: Please install mozdoc npm package localy:');
@@ -38,6 +37,7 @@ program.on('--help', function() {
 
 program.parse(process.argv);
 
+var command = program.args[0];
 // Gets relevant git repo information and passes an object to the callback when // done. The callback as a signature of: callback(err, repoData).
 //
 // repoData structure: {
@@ -78,10 +78,8 @@ function deleteBuildFiles() {
 
 // Copies user's authored resources into our wintersmith directory.
 function copyResources(src, dest) {
-  var mozdocPaths = ['documents', 'images'];
-
-  for (var i = 0; i < mozdocPaths.length; i++) {
-    var p = path.join(src, mozdocPaths[i]);
+  for (var i = 0; i < mozdocResourcePaths.length; i++) {
+    var p = path.join(src, mozdocResourcePaths[i]);
     if(shell.test('-e', p)) {
       if(p === 'documents') {
         shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
@@ -159,7 +157,7 @@ function build(opts, callback) {
     output: 'build', // directory to build site to
     repoData: null, // git repository info from getRepoData();
     branch: null, // Name of the branch being built, required if repoData used
-    wsTemplatePath: './node_modules/mozdoc/wintersmith/',
+    wsTemplatePath: path.join(mozdocPath, 'wintersmith'),
     wsTempPath: './tmp/wintersmith' // directory to copy wsTemplatePath to
   };
   opts = extend({}, DEFAULT_OPTIONS, opts || {});
@@ -209,7 +207,7 @@ if(command === 'build' || command === 'serve') {
       if(command === 'serve') {
         serve(repoData, function(err) {
           require('chokidar')
-            .watch(mozdocPaths, {ignored: /[\/\\]\./})
+            .watch(mozdocResourcePaths, {ignored: /[\/\\]\./})
             .on('all', function(event, path) {
               console.log("event:", event, "path:", path);
               copyResources('./', './tmp/wintersmith');
@@ -220,6 +218,15 @@ if(command === 'build' || command === 'serve') {
 
     buildBranches(repoData, onBranchesBuilt);
   });
+}
+else if (command === 'init' || command === 'new'){
+  var name = program.args[1];
+
+  for (var i = 0; i < mozdocResourcePaths.length; i++) {
+    shell.mkdir('-p', path.join(name, mozdocResourcePaths[i]));
+  }
+
+  shell.cp('wintersmith/contents/index.md', path.join(name, 'documents'));
 }
 else {
   console.error("  Error: '" + command + "' is not a valid command");
