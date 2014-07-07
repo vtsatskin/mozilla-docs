@@ -10,7 +10,7 @@ var extend = require('extend');
 var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
 
-var mozdocResourcePaths = ['documents', 'images'];
+var mozdocResourcePaths = ['documents', 'images', 'css'];
 
 if(!shell.test('-e', mozdocPath)) {
   console.error('  Error: Please install mozdoc npm package localy:');
@@ -84,15 +84,26 @@ function deleteBuildFiles() {
 }
 
 // Copies user's authored resources into our wintersmith directory.
-function copyResources(src, dest) {
+function copyResources(src, wsPath) {
+  // Folder names defined in mozdocResourcePaths will be copied in the
+  // wintersmith (ws) contents folder. For example "images/" in the user's
+  // mozdoc folder will be copied to "wintersmith/contents/images/".
+  // One exception to this is "documents/". Its contents will be copied to the
+  // root of "wintersmith/contents/".
+
   for (var i = 0; i < mozdocResourcePaths.length; i++) {
-    var p = path.join(src, mozdocResourcePaths[i]);
-    if(shell.test('-e', p)) {
-      if(p === path.join(src, 'documents')) {
-        shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
+    var srcDir = path.join(src, mozdocResourcePaths[i]);
+    if(shell.test('-e', srcDir)) {
+      if(srcDir === path.join(src, 'documents')) {
+        // Copy "documents/" to "contents/" instead of "contents/documents".
+        shell.cp('-Rf', path.join(srcDir, '*'), path.join(wsPath, 'contents'));
       }
       else {
-        shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents', p));
+        shell.cp(
+                  '-Rf',
+                  path.join(srcDir, '*'),
+                  path.join(wsPath, 'contents', mozdocResourcePaths[i])
+                );
       }
     }
   }

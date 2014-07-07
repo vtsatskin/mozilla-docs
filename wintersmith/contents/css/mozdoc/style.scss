@@ -18,7 +18,7 @@ body {
 }
 
 .container {
-    background: url(../images/logo.svg) no-repeat #FFF left top;
+    background: url(../../images/mozdoc/logo.svg) no-repeat #FFF left top;
     background-size: 160px;
     padding-top: 50px;
 }
@@ -295,3 +295,5 @@ header h1 {
         margin-right: 20px;
     }
 }
+
+@import url(../style.css);
