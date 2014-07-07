@@ -88,7 +88,7 @@ function copyResources(src, dest) {
   for (var i = 0; i < mozdocResourcePaths.length; i++) {
     var p = path.join(src, mozdocResourcePaths[i]);
     if(shell.test('-e', p)) {
-      if(p === 'documents') {
+      if(p === path.join(src, 'documents')) {
         shell.cp('-Rf', path.join(p, '*'), path.join(dest, 'contents'));
       }
       else {
