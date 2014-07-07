@@ -12,7 +12,7 @@ var originalPath = shell.pwd();
 
 var mozdocResourcePaths = ['documents', 'images'];
 
-if(!shell.test('-e', wintersmithPath)) {
+if(!shell.test('-e', mozdocPath)) {
   console.error('  Error: Please install mozdoc npm package localy:');
   console.error('\n\tnpm install mozdoc\n');
   return;
