@@ -6,6 +6,8 @@ var git = require("gift");
 var path = require("path");
 var wintersmith = require('wintersmith');
 var extend = require('extend');
+var gulp = require('gulp');
+var deploy = require("gulp-gh-pages");
 
 var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
@@ -211,7 +213,7 @@ function serve(repoData, callback) {
   });
 }
 
-if(command === 'build' || command === 'serve') {
+gulp.task('build', function(callback) {
   deleteBuildFiles();
   deleteTempFiles();
 
@@ -232,10 +234,22 @@ if(command === 'build' || command === 'serve') {
             });
         });
       }
+
+      callback();
     };
 
     buildBranches(repoData, onBranchesBuilt);
   });
+});
+
+gulp.task('publish', ['build'], function(callback) {
+  var stream = gulp.src("./build/**/*")
+                .pipe(deploy());
+  return stream;
+});
+
+if(command === 'build' || command === 'serve') {
+  gulp.start("build");
 }
 else if (command === 'init' || command === 'new'){
   var name = program.args[1];
@@ -245,6 +259,9 @@ else if (command === 'init' || command === 'new'){
   }
 
   shell.cp('wintersmith/contents/index.md', path.join(name, 'documents'));
+}
+else if(command === 'publish') {
+  gulp.start("publish");
 }
 else {
   console.error("  Error: '" + command + "' is not a valid command");
