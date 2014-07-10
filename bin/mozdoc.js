@@ -212,7 +212,7 @@ function build(opts, callback) {
     wsConfig.locals.currentBranch = opts.branch;
   }
 
-  var env = wintersmith(config, opts.wsTempPath);
+  var env = wintersmith(wsConfig, opts.wsTempPath);
   env.build(opts.output, function(error) {
     callback(error);
   });
