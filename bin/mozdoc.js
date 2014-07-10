@@ -22,12 +22,6 @@ var mozdocCentralUrl = 'http://tsatsk.in:3000/doc/register';
 
 var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];
 
-if(!shell.test('-e', mozdocPath)) {
-  console.error('  Error: Please install mozdoc npm package localy:');
-  console.error('\n\tnpm install mozdoc\n');
-  return;
-}
-
 program
   .version('0.0.1')
   .option('-o, --output [path]', 'directory to write build-output (defaults to ./build)')
@@ -53,6 +47,14 @@ var command = program.args[0];
 
 program.output = program.output || "./build";
 program.chdir = program.chdir || "./";
+
+function requireMozDoc() {
+  if(!shell.test('-e', mozdocPath)) {
+    console.error('  Error: Please install mozdoc npm package localy:');
+    console.error('\n\tnpm install mozdoc\n');
+    process.exit(1);
+  }
+}
 
 
 // Gets relevant git repo information and passes an object to the callback when // done. The callback as a signature of: callback(err, repoData).
@@ -225,6 +227,8 @@ function serve(repoData, callback) {
 }
 
 gulp.task('build', function(callback) {
+  requireMozDoc();
+
   deleteBuildFiles();
   deleteTempFiles();
 
