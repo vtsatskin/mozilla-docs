@@ -183,6 +183,19 @@ function createRedirect(opts) {
   html.to(source);
 }
 
+function ghPagesUrl(remoteUrl) {
+  var segments = remoteUrl.split('/');
+  var length = segments.length;
+
+  // Removes ssh info if applicible
+  var user = segments[length-2].replace(/^.*\:/, "");
+
+  // Removes trailing ".git" if applicible
+  var repoName = segments[length-1].replace(/\.git$/, "");
+
+  return "http://" + user + ".github.io/" + repoName;
+}
+
 // Builds a wintersmith static site.
 function build(opts, callback) {
   var DEFAULT_OPTIONS = {
@@ -284,9 +297,27 @@ gulp.task('register', function(callback) {
 });
 
 gulp.task('publish', ['build', 'register'], function(callback) {
-  var stream = gulp.src("./build/**/*")
-                .pipe(deploy());
-  return stream;
+  getRepoData(function(err, repoData) {
+    if(typeof repoData.originUrl === 'undefined') {
+      gutil.log("Error: It appears you have published this doc to Github yet.");
+      gutil.log("");
+      gutil.log("Please go to https://github.com/new and create a new repository.");
+      gutil.log("Once you have created a repository, please follow the \"Push an existing repository from the command line\" section.");
+      callback();
+      return;
+    }
+
+    var stream = gulp.src("./build/**/*")
+                  .pipe(deploy())
+                  .on('end', function() {
+                    var ghPagesUrl = ghPagesUrl(repoData.originUrl);
+                    gutil.log("");
+                    gutil.log("Your doc has been successfully published \o/");
+                    gutil.log("You can find it at", ghPagesUrl);
+
+                    callback();
+                  });
+  });
 });
 
 if(command === 'build' || command === 'serve') {
