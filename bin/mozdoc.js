@@ -7,10 +7,14 @@ var path = require("path");
 var wintersmith = require('wintersmith');
 var extend = require('extend');
 var gulp = require('gulp');
+var gutil = require('gulp-util');
 var deploy = require("gulp-gh-pages");
+var request = require("request");
 
+var config = require(path.resolve('./', 'config.json'));
 var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
+var mozdocCentralUrl = 'http://localhost:3000/doc/register';
 
 var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];
 
@@ -65,9 +69,12 @@ function getRepoData(callback) {
         return callback(err, null);
       }
 
-      callback(null, {
-        currentBranch: currentBranch.name,
-        branches: heads
+      repo.config(function(err, config) {
+        callback(null, {
+          currentBranch: currentBranch.name,
+          branches: heads,
+          originUrl: config.items['remote.origin.url']
+        });
       });
     });
   });
@@ -189,14 +196,14 @@ function build(opts, callback) {
 
   // The wintersmith template needs to know about our branches. We're going to
   // inject them into the site's config as locals.
-  var configPath = path.resolve("./", path.join(opts.wsTempPath, 'config.json'));
-  var config = require(configPath);
+  var wsConfigPath = path.resolve("./", path.join(opts.wsTempPath, 'config.json'));
+  var wsConfig = require(wsConfigPath);
   if(opts.repoData) {
     var branches = opts.repoData.branches.map(function(b) { return b.name });
 
-    config.locals = config.locals || {};
-    config.locals.branches = branches;
-    config.locals.currentBranch = opts.branch;
+    wsConfig.locals = wsConfig.locals || {};
+    wsConfig.locals.branches = branches;
+    wsConfig.locals.currentBranch = opts.branch;
   }
 
   var env = wintersmith(config, opts.wsTempPath);
@@ -242,7 +249,31 @@ gulp.task('build', function(callback) {
   });
 });
 
-gulp.task('publish', ['build'], function(callback) {
+gulp.task('register', function(callback) {
+  getRepoData(function(err, repoData) {
+    if(err) gutil.log("Error retrieving repo data: ", err);
+    request.post({
+        method: 'post',
+        uri: mozdocCentralUrl,
+        json: true,
+        body: {
+          config: config,
+          github_remote: repoData.originUrl
+        }
+      },
+      function (err, response, body) {
+        if(err) {
+          gutil.log("Could not register doc with Mozilla Docs Central.");
+          gutil.log("Request error: ");
+          gutil.log(err);
+        }
+        callback();
+      }
+    );
+  });
+});
+
+gulp.task('publish', ['build', 'register'], function(callback) {
   var stream = gulp.src("./build/**/*")
                 .pipe(deploy());
   return stream;
