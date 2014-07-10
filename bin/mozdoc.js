@@ -10,6 +10,7 @@ var gulp = require('gulp');
 var gutil = require('gulp-util');
 var deploy = require("gulp-gh-pages");
 var request = require("request");
+var prompt = require('prompt');
 
 var mozdocPath = './node_modules/mozdoc';
 if(shell.test('-e', './bin/mozdoc.js')) {
@@ -298,7 +299,34 @@ else if (command === 'init' || command === 'new'){
     shell.mkdir('-p', path.join(name, mozdocResourcePaths[i]));
   }
 
-  shell.cp('wintersmith/contents/index.md', path.join(name, 'documents'));
+  shell.cd(name);
+
+  // Build up a config.json for our mozdoc from user input.
+  prompt.start();
+  prompt.get(['name', 'product', 'component'], function (err, result) {
+    var newConfig = {
+      name: result.name,
+      product: result.product,
+      component: result.component
+    }
+
+    JSON.stringify(newConfig, null, 2).to('config.json');
+
+    shell.exec('npm link mozdoc');
+
+    shell.cp(path.join(mozdocPath, 'wintersmith/contents/index.md'), 'documents');
+
+    var ignore = ".DS_Store\nbuild\ntmp\nnode_modules";
+    ignore.to('.gitignore');
+    shell.exec('git init .');
+    shell.exec('git add .');
+    shell.exec('git commit -am "initial commit"');
+
+    var docPath = path.resolve("./");
+    gutil.log("");
+    gutil.log("Your new Mozilla Doc has been created in:");
+    gutil.log("  ", docPath);
+  });
 }
 else if(command === 'publish') {
   gulp.start("publish");
