@@ -14,7 +14,7 @@ var request = require("request");
 var config = require(path.resolve('./', 'config.json'));
 var mozdocPath = './node_modules/mozdoc';
 var originalPath = shell.pwd();
-var mozdocCentralUrl = 'http://localhost:3000/doc/register';
+var mozdocCentralUrl = 'http://tsatsk.in:3000/doc/register';
 
 var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];
 
