@@ -13,6 +13,11 @@ var request = require("request");
 
 var config = require(path.resolve('./', 'config.json'));
 var mozdocPath = './node_modules/mozdoc';
+if(shell.test('-e', './bin/mozdoc.js')) {
+  // We are running from the mozdoc directory.
+  mozdocPath = "./";
+}
+
 var mozdocCentralUrl = 'http://tsatsk.in:3000/doc/register';
 
 var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];

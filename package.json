@@ -13,7 +13,8 @@
     "gulp-gh-pages": "^0.3.3",
     "gulp": "^3.8.5",
     "request": "^2.37.0",
-    "gulp-util": "^2.2.20"
+    "gulp-util": "^2.2.20",
+    "prompt": "^0.2.13"
   },
   "engines": {
     "node": ">=0.8.0"
