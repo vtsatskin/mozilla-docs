@@ -26,6 +26,7 @@ program
   .version('0.0.1')
   .option('-o, --output [path]', 'directory to write build-output (defaults to ./build)')
   .option('-C, --chdir [path]', 'change the working directory')
+  .option('-s, --skip-registration', 'skip registration with Mozilla Docs Central')
   .usage('[command]');
 
 program.on('--help', function() {
@@ -271,6 +272,11 @@ gulp.task('build', function(callback) {
 });
 
 gulp.task('register', function(callback) {
+  if(program.skipRegistration) {
+    callback();
+    return;
+  }
+
   var config = require(path.resolve('./', path.join(program.chdir, 'config.json')));
 
   getRepoData(function(err, repoData) {
