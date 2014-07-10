@@ -233,7 +233,8 @@ function build(opts, callback) {
 }
 
 function serve(repoData, callback) {
-  var env = wintersmith("./tmp/wintersmith/config.json", "./tmp/wintersmith");
+  var wsPath = path.join(program.chdir, 'tmp/wintersmith');
+  var env = wintersmith(path.join(wsPath, 'config.json'), wsPath);
   env.preview(function(error, server) {
     if (error) throw error;
     callback(error);
