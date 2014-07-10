@@ -11,7 +11,6 @@ var gutil = require('gulp-util');
 var deploy = require("gulp-gh-pages");
 var request = require("request");
 
-var config = require(path.resolve('./', 'config.json'));
 var mozdocPath = './node_modules/mozdoc';
 if(shell.test('-e', './bin/mozdoc.js')) {
   // We are running from the mozdoc directory.
@@ -258,6 +257,8 @@ gulp.task('build', function(callback) {
 });
 
 gulp.task('register', function(callback) {
+  var config = require(path.resolve('./', path.join(program.chdir, 'config.json')));
+
   getRepoData(function(err, repoData) {
     if(err) gutil.log("Error retrieving repo data: ", err);
     request.post({
