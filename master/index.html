@@ -1,0 +1,91 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><title>A Mozilla Design Document</title><link rel="stylesheet" href="css/mozdoc/style.css"><link rel="stylesheet" href="css/mozdoc/octicons/octicons.css"><link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700,400italic,600italic,300italic,700italic"><link rel="stylesheet" href="css/style.css"></head><body><div class="container"><header><h1>Mozilla Docs Documentation</h1><div class="version-info"><div href="http://github.com" class="version-info-history"><span class="octicon octicon-mark-github"></span><a href="#todo" class="version-info-history-link">Revision History</a></div><span class="octicon octicon-git-branch"></span><select class="version-info-select"><option value="../docs/index.html">docs</option><option value="../master/index.html" selected>master</option></select></div></header><ul id="toc"></ul><h2 id="overview">Overview</h2>
+<p>This is a template for creating beautiful docs, easily.</p>
+<h2 id="installation">Installation</h2>
+<p>This guide assumes you are running on a relatively recent version of Mac OS X
+and you are at least some-what comfortable with running git commands.</p>
+<h3 id="github-client">Github Client</h3>
+<p>Although not absolutely necessary to use Mozilla Docs, the Github client makes
+working with git easier. Plus it takes care of installing git for you.</p>
+<p>So go ahead and grab a copy of the Github client from <a href="https://mac.github.com/">https://mac.github.com/</a>.
+Make sure you run the app at least once to install the <code>git</code> command.</p>
+<h3 id="node">Node</h3>
+<p>To actually run Mozilla Docs, you will need to install node. You can grab a copy
+from <a href="http://nodejs.org/">http://nodejs.org/</a>.</p>
+<h3 id="mozilla-docs">Mozilla Docs</h3>
+<p>Once you have installed both git and node, we can now install Mozilla Docs.
+Open your Terminal (<em>Applications</em> &gt; <em>Utilities</em> &gt; <em>Terminal.app</em>) and type the
+following command</p>
+<pre><code>npm install -g git+https://git@github.com/vtsatskin/mozilla-docs.git
+</code></pre><p>If nothing yelled at you, congradulations! You&#39;ve successfully installed Mozilla
+Docs \o/</p>
+<h3 id="atom-optional-">Atom (optional)</h3>
+<p>The Atom text editor is recommend for editing Mozilla Docs. You can get it from
+<a href="https://atom.io/">https://atom.io/</a></p>
+<h2 id="your-first-project">Your First Project</h2>
+<h3 id="creating-a-mozilla-doc">Creating a Mozilla Doc</h3>
+<p>Open up your Terminal and change into a directory where you want your Mozilla
+Doc to live. For example, if you want to use your Documents directory you would
+type the following command</p>
+<pre><code>cd ~/Documents
+</code></pre><p>You can pick any directory, so don&#39;t worry if you don&#39;t want to use Documents.</p>
+<p>Let&#39;s create a new Mozilla Doc. You&#39;ll want to use the <code>mozdoc new &lt;directory&gt;</code>
+command. Instead of <em>&lt;directory&gt;</em>, put in a folder name (without spaces!)
+you would like to use.</p>
+<pre><code>mozdoc new my-new-doc
+</code></pre><p>If you can&#39;t think of one <em>my-first-doc</em> should be an adequate one.</p>
+<p>You should see a prompt asking you for various meta data about your document.
+Once you&#39;ve answered all the questions, the new document should be all ready.
+You should see an output similar to this</p>
+<pre><code>[15:38:16] Your new Mozilla Doc has been created in:
+[15:38:16]    /Users/vt/Documents/my-new-doc
+</code></pre><p>If nothing yelled at you, congradulations! You&#39;ve successfully created your
+first Mozilla Doc \o/</p>
+<h3 id="viewing-your-lovely-mozilla-doc">Viewing your lovely Mozilla Doc</h3>
+<p>Go ahead and step into the directory created previously by <code>mozdoc</code> with</p>
+<pre><code>cd my-new-doc
+</code></pre><p>Viewing your Mozilla Doc is quite painless, all you have to do is run the
+following command</p>
+<pre><code>mozdoc serve
+</code></pre><p>Then go to <a href="http://localhost:8080/">http://localhost:8080/</a> in your web browser.</p>
+<h3 id="editing-your-lovely-mozilla-doc">Editing your lovely Mozilla Doc</h3>
+<p>It&#39;s time to write some documents! Go ahead and open your Mozilla Doc&#39;s folder
+in your favourite text editor. If you&#39;ve installed Atom, you can open it with
+one command</p>
+<pre><code>atom
+</code></pre><p>Open up <code>documents/index.md</code>. Changes to this file will show up
+<strong>automatically</strong> on the website. So try changing some words around and see how <a href="http://localhost:8080/">http://localhost:8080/</a> updates automatically.</p>
+<p>Cool huh!</p>
+<p>Let&#39;s try inserting an image. Everyone at Mozilla loves Red Pandas, after all
+<strong>it&#39;s the law</strong>. Go ahead and save the following cute Firefox into your <code>images</code> folder.</p>
+<p><img src="/images/red-panda.jpg" alt=""></p>
+<p>If you want to insert an image, use the following syntax</p>
+<pre><code>![](images/red-panda.jpg)
+</code></pre><p>Save your changes and check out your site. A wild red panda appears, fuck yeah.</p>
+<h3 id="committing-your-changes">Committing your changes</h3>
+<p>Tired of having to keep track of all your changes with files such as <code>design_rev36.jpg</code>? Version control to the rescue!</p>
+<p>With git, you can track what files have changed and incrementally <em>commit</em> your changes. It allows you to have a nice history of all the changes to your design.</p>
+<p>Open up with Github client with the following command</p>
+<pre><code>github
+</code></pre><p>You&#39;ll see something among the lines of this:</p>
+<p><strong>TODO: insert image</strong></p>
+<p>You should be able to review the changes you&#39;ve made. When you&#39;re ready fill in
+the <em>summary</em> field. Something informative like <em>added cute red panda</em> should
+suffice. Remember, you want to be able to get a good idea of what the changes
+were just by the commit message.</p>
+<p>Press the <em>commit</em> button to save your changes. You can press the <em>Publish</em>
+button in the top-right of the app to make sure your changes are synced to
+Github.</p>
+<h3 id="publishing">Publishing</h3>
+<p>You&#39;ve worked hard on your document. You made sure to please the Mozilla Gods
+with your cute red panda antiques. Your document is sure to impress!</p>
+<p>&quot;But how do I share this??&quot; you might ask. Have no fear, that&#39;s why Mozilla Docs
+has a <code>publish</code> command. Try it out</p>
+<pre><code>mozdoc publish
+</code></pre><p>Lots of magic happens here, but now you can find your lovely document at the
+following url</p>
+<pre><code>http://&lt;github user&gt;.github.io/&lt;doc name&gt;
+</code></pre><p>Whenever you&#39;ve got changes you want to share, just run the publish command the
+<code>mozdoc</code> will take care of the rest!</p>
+<h3 id="branching">Branching</h3>
+<p><strong>TODO: how do branch</strong></p>
+<div class="footer"><hr><p>Mozilla 2014.</p></div></div></body><script src="https://code.jquery.com/jquery-1.11.0.min.js"></script><script src="js/mozdoc/jquery.tableofcontents.min.js"></script><script src="js/mozdoc/ddscrollspy.js"></script><script src="js/mozdoc/app.js"></script></html>
