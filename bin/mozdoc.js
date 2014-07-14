@@ -314,7 +314,7 @@ gulp.task('publish', ['build', 'register'], function(callback) {
       return;
     }
 
-    var stream = gulp.src(path.join(program.output, "**/*"))
+    var stream = gulp.src(path.join(program.output, "**/*.*"))
                   .pipe(deploy())
                   .on('end', function() {
                     var ghPagesUrl = ghPagesUrl(repoData.originUrl);
