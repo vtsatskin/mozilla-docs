@@ -306,7 +306,7 @@ gulp.task('register', function(callback) {
 gulp.task('publish', ['build', 'register'], function(callback) {
   getRepoData(function(err, repoData) {
     if(typeof repoData.originUrl === 'undefined') {
-      gutil.log("Error: It appears you have published this doc to Github yet.");
+      gutil.log("Error: It appears you haven't published this doc to Github yet.");
       gutil.log("");
       gutil.log("Please go to https://github.com/new and create a new repository.");
       gutil.log("Once you have created a repository, please follow the \"Push an existing repository from the command line\" section.");
