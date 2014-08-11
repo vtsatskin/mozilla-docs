@@ -228,6 +228,9 @@ function build(opts, callback) {
 
   var env = wintersmith(wsConfig, opts.wsTempPath);
   env.build(opts.output, function(error) {
+    // Hack to fix absolute image urls
+    // Currently only works on OSX
+    shell.exec("sed -i '' 's/\\/images/images/g' " + opts.output + "/*.html");
     callback(error);
   });
 }
