@@ -1,4 +1,5 @@
 {
+  "baseUrl": "./",
   "locals": {
     "title": "A Mozilla Design Document"
   },
