@@ -228,16 +228,22 @@ function build(opts, callback) {
 
   var env = wintersmith(wsConfig, opts.wsTempPath);
   env.build(opts.output, function(error) {
-    // Hack to fix absolute image urls
-    // Currently only works on OSX
-    shell.exec("sed -i '' 's/\\/images/images/g' " + opts.output + "/*.html");
     callback(error);
   });
 }
 
 function serve(repoData, callback) {
+  // Modify wintersmith config to remove baseUrl setting. Without this,
+  // wintersmith preview will not serve any files when baseUrl is set to "./".
+  // baseUrl is set to "./" to force relative image resolution when using
+  // `mozdoc build` or `mozdoc serve`.
+
   var wsPath = path.join(program.chdir, 'tmp/wintersmith');
-  var env = wintersmith(path.join(wsPath, 'config.json'), wsPath);
+  var wsConfigPath = path.resolve("./", path.join(wsPath, 'config.json'));
+  var wsConfig = require(wsConfigPath);
+  wsConfig.baseUrl = null;
+
+  var env = wintersmith(wsConfig, wsPath);
   env.preview(function(error, server) {
     if (error) throw error;
     callback(error);
