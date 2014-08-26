@@ -110,19 +110,50 @@ function copyResources(src, wsPath) {
   for (var i = 0; i < mozdocResourcePaths.length; i++) {
     var srcDir = path.join(src, mozdocResourcePaths[i]);
     if(shell.test('-e', srcDir)) {
-      if(srcDir === path.join(src, 'documents')) {
-        // Copy "documents/" to "contents/" instead of "contents/documents".
-        shell.cp('-Rf', path.join(srcDir, '*'), path.join(wsPath, 'contents'));
-      }
-      else {
-        shell.cp(
-                  '-Rf',
-                  path.join(srcDir, '*'),
-                  path.join(wsPath, 'contents', mozdocResourcePaths[i])
-                );
-      }
+      // Some folders may not exist in the user's mozdoc folder.
+      shell.ls(srcDir).forEach(function(f) {
+        copyResource(src, wsPath, path.join(srcDir, f));
+      })
     }
   }
+}
+
+function copyResource(srcDir, wsPath, srcPath) {
+  var srcFullPath = path.join(srcDir, srcPath);
+  var destFullPath = path.join(wsPath, 'contents', srcPath);
+
+  // Files found in documents/ should resolve to root of wintersmith contents
+  var regex = /^documents/;
+  if(regex.test(srcPath)) {
+    destFullPath = path.join(
+      wsPath,
+      'contents',
+      srcPath.replace(regex, '')
+    );
+  }
+
+  if(shell.test('-d', srcFullPath)) { // a directory
+    shell.mkdir('-p', destFullPath);
+  }
+  else { // a regular file
+    shell.cp('-f', srcFullPath, destFullPath);
+  }
+}
+
+function deleteResource(srcDir, wsPath, srcPath) {
+  var destFullPath = path.join(wsPath, 'contents', srcPath);
+
+  // Files found in documents/ should resolve to root of wintersmith contents
+  var regex = /^documents/;
+  if(regex.test(srcPath)) {
+    destFullPath = path.join(
+      wsPath,
+      'contents',
+      srcPath.replace(regex, '')
+    );
+  }
+
+  shell.rm('-rf', destFullPath);
 }
 
 function copyWintersmithSkeleton(src, dest) {
@@ -264,13 +295,22 @@ gulp.task('build', function(callback) {
       });
 
       if(command === 'serve') {
+        var onResourceAddOrChange = function(path) {
+          copyResource(program.chdir, './tmp/wintersmith', path);
+        }
+
+        var onResourceUnlink = function(path) {
+          deleteResource(program.chdir, './tmp/wintersmith', path);
+        }
+
         serve(repoData, function(err) {
           require('chokidar')
             .watch(mozdocResourcePaths, {ignored: /[\/\\]\./})
-            .on('all', function(event, path) {
-              console.log("event:", event, "path:", path);
-              copyResources(program.chdir, './tmp/wintersmith');
-            });
+            .on('addDir', onResourceAddOrChange)
+            .on('add', onResourceAddOrChange)
+            .on('change', onResourceAddOrChange)
+            .on('unlink', onResourceUnlink)
+            .on('unlinkDir', onResourceUnlink);
         });
       }
 
