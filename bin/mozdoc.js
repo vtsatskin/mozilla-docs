@@ -129,7 +129,7 @@ function copyResources(src, wsPath) {
     if(shell.test('-e', srcDir)) {
       // Some folders may not exist in the user's mozdoc folder.
       shell.ls(srcDir).forEach(function(f) {
-        copyResource(src, wsPath, path.join(srcDir, f));
+        copyResource(src, wsPath, path.join(mozdocResourcePaths[i], f));
       })
     }
   }
