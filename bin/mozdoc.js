@@ -176,16 +176,10 @@ function deleteResource(srcDir, wsPath, srcPath) {
 }
 
 function copyWintersmithSkeleton(src, dest) {
-  // Do not copy over node_modules due to the size. Symlink it instead.
   var sources = shell.ls(src)
-                  .filter(function(f) { return f != "node_modules" })
                   .map(function(f) { return path.join(src, f) });
 
   shell.cp('-Rf', sources, dest);
-
-  var modulesSrc = path.join(src, 'node_modules');
-  var modulesDest = path.join(dest, 'node_modules');
-  shell.ln('-s', modulesSrc, modulesDest);
 }
 
 // Builds each branch as a static site under ./build/<branch name>.
