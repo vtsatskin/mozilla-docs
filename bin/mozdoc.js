@@ -12,12 +12,28 @@ var deploy = require("gulp-gh-pages");
 var request = require("request");
 var prompt = require('prompt');
 
-var mozdocPath = './node_modules/mozdoc';
-if(shell.test('-e', './bin/mozdoc.js')) {
-  // We are running from the mozdoc directory.
-  mozdocPath = "./";
+var getMozdocPath = function() {
+  if(shell.test('-e', './bin/mozdoc.js')) {
+    // We are running from the mozdoc directory.
+    return "./";
+  }
+
+  // Look into where the mozdoc npm module should be installed on the system
+  // See https://www.npmjs.org/doc/files/npm-folders.html#node-modules
+  var isWin32 = process.platform === 'win32';
+  var mozdocPath;
+  var prefix = shell.exec('npm prefix -g', {silent: true}).output.trim();
+  if(isWin32) {
+    mozdocPath = path.join(prefix, 'node_modules/mozdoc');
+  }
+  else {
+    mozdocPath = path.join(prefix, 'lib/node_modules/mozdoc/');
+  }
+
+  return mozdocPath;
 }
 
+var mozdocPath = getMozdocPath();
 var mozdocCentralUrl = 'http://tsatsk.in:3000/doc/register';
 
 var mozdocResourcePaths = ['documents', 'images', 'css', 'js', 'prototypes'];
@@ -51,8 +67,9 @@ program.chdir = program.chdir || "./";
 
 function requireMozDoc() {
   if(!shell.test('-e', mozdocPath)) {
-    console.error('  Error: Please install mozdoc npm package localy:');
-    console.error('\n\tnpm install mozdoc\n');
+    console.error('  Error: Could not find the mozdoc resources folder. Tried looking in:');
+    console.error('\n\t' + mozdocPath + '\n');
+    console.error('This is probably a bug, please report it.')
     process.exit(1);
   }
 }
