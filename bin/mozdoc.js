@@ -129,7 +129,7 @@ function copyResources(src, wsPath) {
     if(shell.test('-e', srcDir)) {
       // Some folders may not exist in the user's mozdoc folder.
       shell.ls(srcDir).forEach(function(f) {
-        copyResource(src, wsPath, path.join(srcDir, f));
+        copyResource(src, wsPath, path.join(mozdocResourcePaths[i], f));
       })
     }
   }
@@ -153,6 +153,8 @@ function copyResource(srcDir, wsPath, srcPath) {
     shell.mkdir('-p', destFullPath);
   }
   else { // a regular file
+    // Create folder if neccessary
+    shell.mkdir('-p', path.dirname(destFullPath));
     shell.cp('-f', srcFullPath, destFullPath);
   }
 }
@@ -174,16 +176,10 @@ function deleteResource(srcDir, wsPath, srcPath) {
 }
 
 function copyWintersmithSkeleton(src, dest) {
-  // Do not copy over node_modules due to the size. Symlink it instead.
   var sources = shell.ls(src)
-                  .filter(function(f) { return f != "node_modules" })
                   .map(function(f) { return path.join(src, f) });
 
   shell.cp('-Rf', sources, dest);
-
-  var modulesSrc = path.join(src, 'node_modules');
-  var modulesDest = path.join(dest, 'node_modules');
-  shell.ln('-s', modulesSrc, modulesDest);
 }
 
 // Builds each branch as a static site under ./build/<branch name>.
