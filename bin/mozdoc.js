@@ -433,11 +433,9 @@ else if (command === 'init' || command === 'new'){
 
     JSON.stringify(newConfig, null, 2).to('config.json');
 
-    shell.exec('npm link mozdoc');
-
     shell.cp(path.join(mozdocPath, 'wintersmith/contents/index.md'), 'documents');
 
-    var ignore = ".DS_Store\nbuild\ntmp\nnode_modules";
+    var ignore = ".DS_Store\nbuild\ntmp";
     ignore.to('.gitignore');
     shell.exec('git init .');
     shell.exec('git add .');
