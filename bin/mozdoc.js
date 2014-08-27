@@ -228,6 +228,19 @@ function ghPagesUrl(remoteUrl) {
   return "http://" + user + ".github.io/" + repoName;
 }
 
+function ghCommitsUrl(remoteUrl, branchName) {
+  var segments = remoteUrl.split('/');
+  var length = segments.length;
+
+  // Removes ssh info if applicible
+  var user = segments[length-2].replace(/^.*\:/, "");
+
+  // Removes trailing ".git" if applicible
+  var repoName = segments[length-1].replace(/\.git$/, "");
+
+  return "https://github.com/" + user + "/" + repoName + "/commits/" + branchName;
+}
+
 // Builds a wintersmith static site.
 function build(opts, callback) {
   var DEFAULT_OPTIONS = {
@@ -251,10 +264,14 @@ function build(opts, callback) {
   var wsConfig = require(wsConfigPath);
   if(opts.repoData) {
     var branches = opts.repoData.branches.map(function(b) { return b.name });
+    var commitsUrl = opts.repoData.originUrl ?
+                      ghCommitsUrl(opts.repoData.originUrl, opts.branch):
+                      null;
 
     wsConfig.locals = wsConfig.locals || {};
     wsConfig.locals.branches = branches;
     wsConfig.locals.currentBranch = opts.branch;
+    wsConfig.locals.revisionsLink = commitsUrl;
   }
 
   var env = wintersmith(wsConfig, opts.wsTempPath);
