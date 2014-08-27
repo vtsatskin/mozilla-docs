@@ -153,6 +153,8 @@ function copyResource(srcDir, wsPath, srcPath) {
     shell.mkdir('-p', destFullPath);
   }
   else { // a regular file
+    // Create folder if neccessary
+    shell.mkdir('-p', path.dirname(destFullPath));
     shell.cp('-f', srcFullPath, destFullPath);
   }
 }
