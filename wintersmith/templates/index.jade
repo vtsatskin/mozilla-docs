@@ -21,10 +21,14 @@ html(lang='en')
               a(href=revisionsLink).version-info-history-link Revision History
           if branches
             span.octicon.octicon-git-branch
-            select.version-info-select
-              each branch in branches
-                option(value="../" + branch + "/index.html", selected= currentBranch == branch)
-                  = branch
+            if serving
+              select.version-info-select(disabled= serving == true, title="Branch selection not available when running 'mozdoc serve'")
+                option= currentBranch
+            else
+              select.version-info-select(disabled= serving == true)
+                each branch in branches
+                  option(value="../" + branch + "/index.html", selected= currentBranch == branch)
+                    = branch
 
       ul#toc
       != page.html
