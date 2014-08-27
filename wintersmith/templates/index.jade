@@ -15,9 +15,10 @@ html(lang='en')
         h1= page.title
 
         div.version-info
-          div.version-info-history(href="http://github.com")
-            span.octicon.octicon-mark-github
-            a(href="#todo").version-info-history-link Revision History
+          if revisionsLink
+            div.version-info-history
+              span.octicon.octicon-mark-github
+              a(href=revisionsLink).version-info-history-link Revision History
           if branches
             span.octicon.octicon-git-branch
             select.version-info-select
