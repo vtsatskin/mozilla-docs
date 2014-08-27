@@ -35,5 +35,6 @@
   "homepage": "https://github.com/darrinhenein/mozilla-docs",
   "bin": {
     "mozdoc": "./bin/mozdoc.js"
-  }
+  },
+  "preferGlobal": true
 }
