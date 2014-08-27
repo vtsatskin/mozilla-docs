@@ -289,6 +289,7 @@ function build(opts, callback) {
     wsConfig.locals.branches = branches;
     wsConfig.locals.currentBranch = opts.branch;
     wsConfig.locals.revisionsLink = commitsUrl;
+    wsConfig.locals.serving = command === 'serve';
   }
 
   var env = wintersmith(wsConfig, opts.wsTempPath);
