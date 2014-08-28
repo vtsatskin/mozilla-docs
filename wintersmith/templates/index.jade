@@ -10,6 +10,9 @@ html(lang='en')
     link(rel='stylesheet', href='css/style.css')
 
   body
+    if ghRepoUrl
+      a(href= ghRepoUrl)
+        img.fork-ribbon(src="images/mozdoc/fork-ribbon.png", alt="Fork me on GitHub")
     div.container
       header
         h1= page.title
